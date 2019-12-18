@@ -24,6 +24,10 @@
 	width: 100%;
 }
 
+#ab-input{
+	padding-bottom: 0;
+}
+
 #ab-field{
 	display: none;
 	height: auto;

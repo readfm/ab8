@@ -16,6 +16,7 @@ var fillup = () => {
 	$input.append(location.href);
 	$input.append("&nbsp;");
 	$input.focus();
+	placeCaretAtEnd($input[0]);
 }
 
 fillup();
