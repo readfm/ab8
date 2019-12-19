@@ -1,9 +1,9 @@
 var ab = document.createElement('div');
 ab.id = 'ab';
-document.body.append(ab);
+document.body.prepend(ab);
 
 $input = $("<div id='ab-input' contentEditable></div>").appendTo(ab);
-$field = $("<div id='ab-field' contentEditable></div>").appendTo(ab);
+$field = $("<div id='ab-field'></div>").appendTo(ab);
 
 
 
@@ -12,10 +12,10 @@ var url = new URL(location);
 var fillup = () => {
 	$input.text('');
 	var text = document.createElement('div');
-	text.class = 'ab-text';
+	text.classList.add('ab-text');
 	text.innerHTML = '&nbsp';
 	$input.append(text);
-	var addr = location.href.replace('http://', '').replace('https://', '');
+	var addr = location.href//.replace('http://', '').replace('https://', '');
 	$input.append(`<div hidden class='ab-url'>${addr}</div>`);
 	$input.append("<span hidden class='current_time'></div>");
 	$input.focus();
@@ -27,7 +27,7 @@ fillup();
 setInterval(() => {
 	var $fields = $('.current_time');
 
-	if(!$fields.length || $fields.is(':visible')) return;
+	if(!$fields.length) return;
 	
 	var d = new Date;
 	var time = ''+d.getFullYear() + 
@@ -60,14 +60,16 @@ $(document).bind("keydown", function(ev){
 		//carousel.$t.children('.focus').next().addClass('focus').siblings().removeClass('focus');
 	}
 	else
-	if(ev.shiftKey && ev.key == "Enter"){
+	if(/*ev.shiftKey && */ev.key == "Enter"){
 		ev.preventDefault();
 
-		let $inp = $input.clone();
-		$inp.children().show().after('&nbsp;');
-		var input_text = $inp[0].innerText;
+		//let $inp = $input.clone();
+		//$inp.children().show().after('&nbsp;');
+		var a = document.createElement('a');
+		a.href = $input.find('.ab-url').text()
+		a.innerText = $input.find('.ab-text').text();
 		$field.show().prepend('<br/>');
-		$field.prepend(input_text);
+		$field.prepend(a);
 		fillup();
 
 		return false;
