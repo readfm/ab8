@@ -7,9 +7,9 @@
    },
    "commands": {
       "toggle": {
-         "description": "Show/hide carousel",
+         "description": "Show/hide stuff",
          "suggested_key": {
-            "default": "Alt+C"
+            "default": "Ctrl+C"
          }
       }
    },

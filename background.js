@@ -27,7 +27,7 @@ window.Pic = {
       .then(s => s.executeCodes('console.log("libs loaded")'))
       .then(s => s.executeCodes('var User = '+jsonUser+';'))
       .then(s => s.executeScripts(
-        "cfg.js", "lib/functions.js", "lib/gif.js", "lib/Catalog.js",  "lib/Elem.js", "run.js"
+        "cfg.js", "lib/functions.js", "run.js"
       ))
       .then(s => s.injectCss("ext.css"))
       .then(function(){
@@ -236,9 +236,10 @@ Pic.ready.push(function(){
 });
 
 chrome.commands.onCommand.addListener(function(command){
+  console.log('tog ', command);
   if(command === "toggle"){
-    chrome.tabs.query({currentWindow: true, active: true},
-        function(tabArray){
+    chrome.tabs.query({currentWindow: true, active: true}, (tabArray) => {
+        console.log(tabArray, 111);
           var tab = tabArray[0];
           Pic.toggle(tab.id);
         }

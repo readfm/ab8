@@ -63,11 +63,13 @@ $(document).bind("keydown", function(ev){
 	if(/*ev.shiftKey && */ev.key == "Enter"){
 		ev.preventDefault();
 
+		var text = $input.find('.ab-text').text().trim();
+		if(!text.length) return false;
 		//let $inp = $input.clone();
 		//$inp.children().show().after('&nbsp;');
 		var a = document.createElement('a');
-		a.href = $input.find('.ab-url').text()
-		a.innerText = $input.find('.ab-text').text();
+		a.href = $input.find('.ab-url').text();
+		a.innerText = text;
 		$field.show().prepend('<br/>');
 		$field.prepend(a);
 		fillup();
@@ -95,9 +97,64 @@ $(document).bind("keydown", function(ev){
 });
 
 
+var Pix = {
+	leaveGap: function(px){
+		Pix.$fixed.each(function(){
+			var $el = $(this);
+			$el.css('top', $el.data('_pix8-top') + px);
+		});
+
+		$('body').css('margin-top', Pix.marginBody + px);
+	},
+
+	restoreGap: function(){
+		if(isNaN(Pix.marginBody)) return;
+
+		Pix.$fixed.each(function(){
+			var $el = $(this);
+			$el.css('top', $el.data('_pix8-top'));
+		});
+
+		$('body').css('margin-top', Pix.marginBody);
+	},
+
+	$fixed: $(),
+	collectFixed: function(){
+		var $fixed = Pix.$fixed = $('*').filter(function(){
+			var $el = $(this);
+			var position = $el.css('position');
+			var ok = ((
+					(position === 'absolute' && !Pix.isRelative($el)) ||
+					position === 'fixed'
+				) &&
+				this.id != 'pic' &&
+				!$el.hasClass('carousel-tag') &&
+				!isNaN(parseInt($el.css('top')))
+			);
+			if(ok) $el.data('_pix8-top', parseInt($el.css('top')));
+			return ok;
+		});
+
+		Pix.marginBody = parseInt($('body').css('margin-top')) || 0;
+		Pix.leaveGap(ab.clientHeight + 9);
+	},
+
+	isRelative: function($el){
+		var y = false;
+		$el.parents().each(function(){
+			if(['relative', 'fixed', 'absolute'].indexOf($(this).css('position'))+1)
+				y = true;
+		});
+
+		return y;
+	},
+};
+
+Pix.collectFixed();
 
 
 chrome.runtime.onMessage.addListener(function(d, sender, sendResponse){
+	let $ab = $(ab);
   	if(d.cmd == 'carousel'){
   		if(d.do) $ab[d.do]();
   		sendResponse({
