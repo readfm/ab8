@@ -11,12 +11,15 @@ var url = new URL(location);
 
 var fillup = () => {
 	$input.text('');
-	$input.append("<span class='current_time'></div>");
-	$input.append("&nbsp;");
-	$input.append(location.href);
-	$input.append("&nbsp;");
+	var text = document.createElement('div');
+	text.class = 'ab-text';
+	text.innerHTML = '&nbsp';
+	$input.append(text);
+	var addr = location.href.replace('http://', '').replace('https://', '');
+	$input.append(`<div hidden class='ab-url'>${addr}</div>`);
+	$input.append("<span hidden class='current_time'></div>");
 	$input.focus();
-	placeCaretAtEnd($input[0]);
+	placeCaretAtEnd(text);
 }
 
 fillup();
@@ -24,10 +27,15 @@ fillup();
 setInterval(() => {
 	var $fields = $('.current_time');
 
-	if(!$fields.length) return;
+	if(!$fields.length || $fields.is(':visible')) return;
 	
 	var d = new Date;
-	var time = ''+d.getFullYear() + d.getMonth() + d.getDay() + d.getHours() + d.getMinutes() + d.getSeconds()
+	var time = ''+d.getFullYear() + 
+		(d.getMonth()<10?'0':'')+d.getMonth() + 
+		(d.getDay()<10?'0':'')+d.getDay() + 
+		(d.getHours()<10?'0':'')+d.getHours() + 
+		(d.getMinutes()<10?'0':'')+d.getMinutes() + 
+		(d.getSeconds()<10?'0':'')+d.getSeconds();
 
 	$fields.text(time);
 }, 1000);
@@ -43,19 +51,21 @@ $(document).bind("keydown", function(ev){
 	console.log(ev);
 
 	if(ev.keyCode == 37){
-		carousel.motion(-25);
+		//carousel.motion(-25);
 		//carousel.$t.children('.focus').prev().addClass('focus').siblings().removeClass('focus');
 	}
 	else
 	if(ev.keyCode == 39){
-		carousel.motion(25);
+		//carousel.motion(25);
 		//carousel.$t.children('.focus').next().addClass('focus').siblings().removeClass('focus');
 	}
 	else
 	if(ev.shiftKey && ev.key == "Enter"){
 		ev.preventDefault();
 
-		var input_text = $input[0].innerText;
+		let $inp = $input.clone();
+		$inp.children().show().after('&nbsp;');
+		var input_text = $inp[0].innerText;
 		$field.show().prepend('<br/>');
 		$field.prepend(input_text);
 		fillup();
@@ -64,6 +74,14 @@ $(document).bind("keydown", function(ev){
 	}
 	else
 	if(ev.key == "F2"){
+		var $inp = $('#ab-input > div:not([hidden])');
+		var $next = $inp.next();
+		if(!$next.length) $next = $('#ab-input > div:first-child');
+
+		$next.attr('hidden', null).siblings().attr('hidden', true);;
+	}
+	else
+	if(ev.key == "F3"){
 		//carousel.$t.children('.focus').click();
 
 		var chosenFileEntry = null;
