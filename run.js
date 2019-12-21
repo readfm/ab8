@@ -3,7 +3,7 @@ ab.id = 'ab';
 document.body.prepend(ab);
 
 $input = $("<div id='ab-input' contentEditable></div>").appendTo(ab);
-$field = $("<div id='ab-field' contentEditable></div>").appendTo(ab);
+$field = $("<div id='ab-field'></div>").appendTo(ab);
 
 
 
@@ -68,17 +68,33 @@ $(document).bind("keydown", function(ev){
 		//let $inp = $input.clone();
 		//$inp.children().show().after('&nbsp;');
 		var a = document.createElement('a');
+		a.contentEditable = true;
+		a.classList.add('item');
 		a.href = $input.find('.ab-url').text();
 		a.innerText = text;
-		$field.show().prepend('<br/>');
-		$field.prepend(a);
+
+		$field.show().prepend(a);
 		fillup();
 
 		return false;
 	}
 	else
-	if(ev.shiftKey && ev.key == "ArrowUp"){
+	if(ev.altKey && ev.key == "ArrowUp"){
 		console.log(ev);
+		var $focused = $('#ab-field > .item:focus'),
+			$prev = $focused.prevAll('.item').first();
+
+		if($prev.length) $focused.insertBefore($prev);
+		$focused.focus();
+	}
+	else
+	if(ev.altKey && ev.key == "ArrowDown"){
+		console.log(ev);
+		var $focused = $('#ab-field > .item:focus'),
+			$next = $focused.nextAll('.item').first();
+
+		if($next.length) $focused.insertAfter($next);
+		$focused.focus();
 	}
 	else
 	if(ev.key == "F2"){

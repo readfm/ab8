@@ -9,7 +9,7 @@
       "toggle": {
          "description": "Show/hide stuff",
          "suggested_key": {
-            "default": "Ctrl+C"
+            "default": "Ctrl+B"
          }
       }
    },
