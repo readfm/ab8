@@ -3,7 +3,7 @@ ab.id = 'ab';
 document.body.prepend(ab);
 
 $input = $("<div id='ab-input' contentEditable></div>").appendTo(ab);
-$field = $("<div id='ab-field'></div>").appendTo(ab);
+$field = $("<div id='ab-field' contentEditable></div>").appendTo(ab);
 
 
 
@@ -81,7 +81,7 @@ $(document).bind("keydown", function(ev){
 	else
 	if(ev.altKey && ev.key == "ArrowUp"){
 		console.log(ev);
-		var $focused = $('#ab-field > .item:focus'),
+		var $focused = $(':focus'),
 			$prev = $focused.prevAll('.item').first();
 
 		if($prev.length) $focused.insertBefore($prev);
@@ -90,7 +90,7 @@ $(document).bind("keydown", function(ev){
 	else
 	if(ev.altKey && ev.key == "ArrowDown"){
 		console.log(ev);
-		var $focused = $('#ab-field > .item:focus'),
+		var $focused = $(':focus'),
 			$next = $focused.nextAll('.item').first();
 
 		if($next.length) $focused.insertAfter($next);

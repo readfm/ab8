@@ -41,3 +41,7 @@
 	color: white;
 	font-weight: normal;
 }
+
+#ab-field a{
+	text-decoration: none;
+}
