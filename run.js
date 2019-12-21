@@ -3,7 +3,7 @@ ab.id = 'ab';
 document.body.prepend(ab);
 
 $input = $("<div id='ab-input' contentEditable></div>").appendTo(ab);
-$field = $("<div id='ab-field'></div>").appendTo(ab);
+$field = $("<div id='ab-field' contentEditable></div>").appendTo(ab);
 
 
 
@@ -75,6 +75,10 @@ $(document).bind("keydown", function(ev){
 		fillup();
 
 		return false;
+	}
+	else
+	if(ev.shiftKey && ev.key == "ArrowUp"){
+		console.log(ev);
 	}
 	else
 	if(ev.key == "F2"){
