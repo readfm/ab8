@@ -105,14 +105,23 @@ $(document).bind("keydown", function(ev){
 		$next.attr('hidden', null).siblings().attr('hidden', true);;
 	}
 	else
-	if(ev.key == "F3"){
+	if(ev.key == "F4"){
 		//carousel.$t.children('.focus').click();
 
 		var chosenFileEntry = null;
 
 		chrome.runtime.sendMessage({cmd: 'readFile'}, r => {
 			console.log(r);
+			$field.show()[0].innerText = r.content;
 		});
+	}
+	else
+	if(ev.key == "F7"){
+		//carousel.$t.children('.focus').click();
+
+		var chosenFileEntry = null;
+
+		chrome.runtime.sendMessage({cmd: 'writeFile', content: $field[0].innerText});
 	}
 });
 

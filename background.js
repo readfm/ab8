@@ -95,6 +95,15 @@ S.session = function(m){
   });
 }
 
+var fileHandle;
+var writeHandle;
+
+const fileOpts = {
+  type: 'saveFile',
+  accepts: [{
+    description: 'Choose text file'
+  }],
+};
 
 var inserted;
 chrome.browserAction.onClicked.addListener(function(tab){
@@ -108,22 +117,38 @@ chrome.runtime.onMessage.addListener(function(d, sender, sendResponse){
   }
   else
   if(d.cmd == 'readFile'){
-      chrome.fileSystem.chooseEntry({type: 'openFile'}, entry => {
-          console.log('choose')
-          entry.file(file => {
-              console.log('file', file)
+    var readFile = async handle => {
 
-              var reader = new FileReader();
+      const file = await handle.getFile();
+      const content = await file.text();
 
-              reader.onerror = errorHandler;
-              reader.onloadend = function(e) {
-                 // sendResponse(e.target.result);
-              };
+      sendResponse({content});
+    };
 
-              reader.readAsText(file);
-          });
-      });
+    if(fileHandle) readFile(fileHandle);
+    else window.chooseFileSystemEntries().then(async handle => {
+      fileHandle = handle;
+      readFile(fileHandle)
+    });
+
+    return true;
   }
+  else
+  if(d.cmd == 'writeFile'){
+    var writeFile = async (handle, content) => {
+      const writer = await handle.createWriter();
+      await writer.write(0, content);
+      await writer.close();
+    }
+
+    if(writeHandle) writeFile(writeHandle, d.content);
+    else window.chooseFileSystemEntries(fileOpts).then(async handle => {
+      writeHandle = handle;
+      writeFile(writeHandle, d.content)
+      
+    });
+  }
+  else
   if(d.cmd == 'ws'){
     console.log(d);
     ws.send(d.d, function(r){
@@ -131,6 +156,7 @@ chrome.runtime.onMessage.addListener(function(d, sender, sendResponse){
     });
     return true;
   }
+  else
   if(d.cmd == 'download'){
     ws.download(d.id).then(function(data, file){
       console.log(data);
@@ -184,6 +210,7 @@ chrome.runtime.onMessage.addListener(function(d, sender, sendResponse){
       image.src = src;
     });
   }
+  else
   if(d.cmd == 'carousel.updated'){
     Object.keys(Pic.tabs).forEach(function(tabId){
       if(sender.tab.id != tabId)
