@@ -79,6 +79,10 @@ $(document).bind("keydown", function(ev){
 			if(text.trim() == '+'){
 				a.classList.toggle('ab-plus');
 			}
+
+			if(text.trim() == '-'){
+				a.classList.toggle('ab-minus');
+			}
 		});
 
 		$field.show().prepend(a);

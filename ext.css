@@ -48,10 +48,14 @@
 	text-decoration: none;
 }
 
-#ab-field .item:active{
+#ab-field .item:focus-within{
 	background-color: #000000cc;
 }
 
 #ab-field .ab-plus ~ .item{
 	display: none;
+}
+
+#ab-field .ab-minus ~ .item{
+	display: block;
 }
