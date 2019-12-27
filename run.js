@@ -73,6 +73,14 @@ $(document).bind("keydown", function(ev){
 		a.href = $input.find('.ab-url').text();
 		a.innerText = text;
 
+		a.addEventListener('click', ev => {
+			var a = ev.target,
+				text = a.innerText;
+			if(text.trim() == '+'){
+				a.classList.toggle('ab-plus');
+			}
+		});
+
 		$field.show().prepend(a);
 		fillup();
 

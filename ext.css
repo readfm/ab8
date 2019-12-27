@@ -41,8 +41,17 @@
 	display: block;
 	color: white;
 	font-weight: normal;
+	outline: none;
 }
 
 #ab-field a{
 	text-decoration: none;
+}
+
+#ab-field .item:active{
+	background-color: #000000cc;
+}
+
+#ab-field .ab-plus ~ .item{
+	display: none;
 }
