@@ -69,7 +69,7 @@ var checkLine = line => {
 	}
 };
 
-$(document).bind("keydown", function(ev){
+$(document).bind("keyup", function(ev){
 	/*
 	if(!carousel.$t.children('.focus').length){
 		carousel.$t.children().eq(0).addClass('focus');
