@@ -34,6 +34,7 @@
 	display: none;
 	height: auto;
 	padding-top: 0;
+	padding: 0;
 }
 
 
@@ -42,20 +43,24 @@
 	color: white;
 	font-weight: normal;
 	outline: none;
+	padding-left: 15px;
 }
 
 #ab-field a{
 	text-decoration: none;
 }
 
-#ab-field .item:focus-within{
-	background-color: #000000cc;
+#ab-field .item.active{
+	background-color: #68686891;
 }
 
-#ab-field .ab-plus ~ .item{
+#ab-field .ab-plus.on ~ .item{
 	display: none;
 }
 
-#ab-field .ab-minus ~ .item{
+#ab-field a.item.ab-minus{
+	display: block;
+}
+#ab-field a.item.ab-minus ~ .item{
 	display: block;
 }

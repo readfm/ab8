@@ -40,6 +40,35 @@ setInterval(() => {
 	$fields.text(time);
 }, 1000);
 
+$field[0].addEventListener('change', ev => {
+	var a = ev.target,
+		text = a.innerText;
+
+		console.log(ev);
+	a.classList[(text.trim() == '-')?'add':'remove']('ab-minus');	
+});
+
+var setActive = (el) => {
+	$field.children('.active').removeClass('active');
+	el.classList.add('active');
+};
+
+var checkLine = line => {
+	var a = line,
+		text = a.innerText;
+
+	a.classList.remove('ab-plus');
+	a.classList.remove('ab-minus');
+
+	if(text.trim() == '+'){
+		a.classList.add('ab-plus');
+	}
+
+	if(text.trim() == '-'){
+		a.classList.add('ab-minus');
+	}
+};
+
 $(document).bind("keydown", function(ev){
 	/*
 	if(!carousel.$t.children('.focus').length){
@@ -48,7 +77,12 @@ $(document).bind("keydown", function(ev){
 	}
 	*/
 
-	console.log(ev);
+	let range = document.getSelection().getRangeAt(0);
+	var active = range.startContainer.parentNode;
+
+	setActive(active);
+
+	checkLine(active);
 
 	if(ev.keyCode == 37){
 		//carousel.motion(-25);
@@ -76,16 +110,16 @@ $(document).bind("keydown", function(ev){
 		a.addEventListener('click', ev => {
 			var a = ev.target,
 				text = a.innerText;
-			if(text.trim() == '+'){
-				a.classList.toggle('ab-plus');
-			}
+
+			a.classList.toggle('on');
 
 			if(text.trim() == '-'){
-				a.classList.toggle('ab-minus');
+				$(a).prevAll('.ab-plus').first().click();
 			}
 		});
 
 		$field.show().prepend(a);
+		checkLine(a);
 		fillup();
 
 		return false;
@@ -93,7 +127,7 @@ $(document).bind("keydown", function(ev){
 	else
 	if(ev.altKey && ev.key == "ArrowUp"){
 		console.log(ev);
-		var $focused = $(':focus'),
+		var $focused = $(range.endContainer.parentNode),
 			$prev = $focused.prevAll('.item').first();
 
 		if($prev.length) $focused.insertBefore($prev);
@@ -102,12 +136,26 @@ $(document).bind("keydown", function(ev){
 	else
 	if(ev.altKey && ev.key == "ArrowDown"){
 		console.log(ev);
-		var $focused = $(':focus'),
+		var $focused = $(range.endContainer.parentNode),
 			$next = $focused.nextAll('.item').first();
 
 		if($next.length) $focused.insertAfter($next);
 		$focused.focus();
 	}
+	else
+	if(ev.key == "F9"){
+		var a = range.endContainer.parentNode,
+			text = a.innerText;
+
+		a.classList.toggle('on');
+
+		if(text.trim() == '-'){
+			$(a).prevAll('.ab-plus').first().click();
+		}
+
+		ev.preventDefault();
+		return false;
+    }
 	else
 	if(ev.key == "F2"){
 		var $inp = $('#ab-input > div:not([hidden])');
