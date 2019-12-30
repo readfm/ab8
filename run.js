@@ -143,7 +143,7 @@ $(document).bind("keydown", function(ev){
 		$focused.focus();
 	}
 	else
-	if(ev.key == "F9"){
+	if(ev.key == "F9" || ev.key == "F8"){
 		var a = range.endContainer.parentNode,
 			text = a.innerText;
 
