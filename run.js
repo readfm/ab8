@@ -69,31 +69,18 @@ var checkLine = line => {
 	}
 };
 
-$(document).bind("keyup", function(ev){
-	/*
-	if(!carousel.$t.children('.focus').length){
-		carousel.$t.children().eq(0).addClass('focus');
-		return;
-	}
-	*/
+function moveCaretToEnd(el) {
+    if (typeof el.selectionStart == "number") {
+        el.selectionStart = el.selectionEnd = el.value.length;
+    } else if (typeof el.createTextRange != "undefined") {
+        el.focus();
+        var range = el.createTextRange();
+        range.collapse(false);
+        range.select();
+    }
+}
 
-	let range = document.getSelection().getRangeAt(0);
-	var active = range.startContainer.parentNode;
-
-	setActive(active);
-
-	checkLine(active);
-
-	if(ev.keyCode == 37){
-		//carousel.motion(-25);
-		//carousel.$t.children('.focus').prev().addClass('focus').siblings().removeClass('focus');
-	}
-	else
-	if(ev.keyCode == 39){
-		//carousel.motion(25);
-		//carousel.$t.children('.focus').next().addClass('focus').siblings().removeClass('focus');
-	}
-	else
+$(document).bind("keydown", function(ev){
 	if(/*ev.shiftKey && */ev.key == "Enter"){
 		ev.preventDefault();
 
@@ -124,6 +111,29 @@ $(document).bind("keyup", function(ev){
 
 		return false;
 	}
+});
+
+$(document).bind("keyup", function(ev){
+	/*
+	if(!carousel.$t.children('.focus').length){
+		carousel.$t.children().eq(0).addClass('focus');
+		return;
+	}
+	*/
+
+	var range = document.getSelection().getRangeAt(0);
+	var active = range.startContainer.parentNode;
+
+
+	if(ev.keyCode == 37){
+		//carousel.motion(-25);
+		//carousel.$t.children('.focus').prev().addClass('focus').siblings().removeClass('focus');
+	}
+	else
+	if(ev.keyCode == 39){
+		//carousel.motion(25);
+		//carousel.$t.children('.focus').next().addClass('focus').siblings().removeClass('focus');
+	}
 	else
 	if(ev.altKey && ev.key == "ArrowUp"){
 		console.log(ev);
@@ -132,6 +142,9 @@ $(document).bind("keyup", function(ev){
 
 		if($prev.length) $focused.insertBefore($prev);
 		$focused.focus();
+
+		range = document.getSelection().getRangeAt(0);
+		active = range.startContainer.parentNode;
 	}
 	else
 	if(ev.altKey && ev.key == "ArrowDown"){
@@ -141,6 +154,10 @@ $(document).bind("keyup", function(ev){
 
 		if($next.length) $focused.insertAfter($next);
 		$focused.focus();
+
+
+		range = document.getSelection().getRangeAt(0);
+		active = range.startContainer.parentNode;
 	}
 	else
 	if(ev.key == "F9" || ev.key == "F8"){
@@ -183,6 +200,11 @@ $(document).bind("keyup", function(ev){
 
 		chrome.runtime.sendMessage({cmd: 'writeFile', content: $field[0].innerText});
 	}
+
+
+	setActive(active);
+
+	checkLine(active);
 });
 
 
