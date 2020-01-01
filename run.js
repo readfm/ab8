@@ -3,7 +3,7 @@ ab.id = 'ab';
 document.body.prepend(ab);
 
 $input = $("<div id='ab-input' contentEditable></div>").appendTo(ab);
-$field = $("<div id='ab-field' contentEditable></div>").appendTo(ab);
+$field = $("<div id='ab-field'></div>").appendTo(ab);
 
 
 
@@ -69,16 +69,51 @@ var checkLine = line => {
 	}
 };
 
-function moveCaretToEnd(el) {
-    if (typeof el.selectionStart == "number") {
-        el.selectionStart = el.selectionEnd = el.value.length;
-    } else if (typeof el.createTextRange != "undefined") {
+function moveCaretToEnd(el){
+	if(typeof el.selectionStart == "number" && 0){
+		el.selectionStart = el.selectionEnd = el.value.length;
+    } else{
         el.focus();
-        var range = el.createTextRange();
-        range.collapse(false);
-        range.select();
+		var range = document.createRange();
+		range.selectNode(el);
+        //range.collapse(false);
     }
 }
+
+function build(item){
+	var a = document.createElement('a');
+	a.contentEditable = true;
+	a.classList.add('item');
+	a.href = item.url;
+	a.innerText = item.text || item.title;
+
+	a.addEventListener('click', ev => {
+		var a = ev.target,
+			text = a.innerText;
+
+		a.classList.toggle('on');
+
+		if(text.trim() == '-'){
+			$(a).prevAll('.ab-plus').first().click();
+		}
+	});
+
+	a.addEventListener('focus', ev => {
+		setActive(a);
+	});
+	
+	checkLine(a);
+
+	return a;
+}
+
+chrome.runtime.sendMessage({cmd: 'listTabs'}, r => {
+	r.list.forEach(item => {
+		var a = build(item);
+
+		$field.prepend(a);
+	});
+});
 
 $(document).bind("keydown", function(ev){
 	if(/*ev.shiftKey && */ev.key == "Enter"){
@@ -88,27 +123,51 @@ $(document).bind("keydown", function(ev){
 		if(!text.length) return false;
 		//let $inp = $input.clone();
 		//$inp.children().show().after('&nbsp;');
-		var a = document.createElement('a');
-		a.contentEditable = true;
-		a.classList.add('item');
-		a.href = $input.find('.ab-url').text();
-		a.innerText = text;
 
-		a.addEventListener('click', ev => {
-			var a = ev.target,
-				text = a.innerText;
-
-			a.classList.toggle('on');
-
-			if(text.trim() == '-'){
-				$(a).prevAll('.ab-plus').first().click();
-			}
-		});
+		var item = {
+			text,
+			url: $input.find('.ab-url').text()
+		};
+		var a = build(item);
 
 		$field.show().prepend(a);
-		checkLine(a);
 		fillup();
 
+		return false;
+	}
+
+	var range = document.getSelection().getRangeAt(0);
+	var active = range.startContainer.parentNode;
+
+	if(ev.altKey && ev.key == "ArrowUp"){
+		var $focused = $('.active'),
+			$prev = $focused.prevAll('.item').first();
+
+		if($prev.length) $focused.insertBefore($prev);
+		moveCaretToEnd($focused[0]);
+	}
+	else
+	if(ev.altKey && ev.key == "ArrowDown"){
+		console.log(ev);
+		var $focused = $('.active'),
+			$next = $focused.nextAll('.item').first();
+
+		if($next.length) $focused.insertAfter($next);
+		moveCaretToEnd($focused[0]);
+	}
+	else
+	if(ev.key == "ArrowUp" || ev.key == "ArrowDown"){
+		console.log(range.endContainer.parentNode);
+		var $focused = $(range.endContainer.parentNode);
+		var $another = $focused[(ev.key == 'ArrowUp')?'prevAll':'nextAll']('.item').first();
+
+		if(ev.shiftKey) $focused[0].classList.toggle('selected');
+		else $field.find('.selected').removeClass('selected');
+
+		moveCaretToEnd($another[0]);
+
+		//$prev.focus();
+		ev.preventDefault();
 		return false;
 	}
 });
@@ -133,31 +192,6 @@ $(document).bind("keyup", function(ev){
 	if(ev.keyCode == 39){
 		//carousel.motion(25);
 		//carousel.$t.children('.focus').next().addClass('focus').siblings().removeClass('focus');
-	}
-	else
-	if(ev.altKey && ev.key == "ArrowUp"){
-		console.log(ev);
-		var $focused = $(range.endContainer.parentNode),
-			$prev = $focused.prevAll('.item').first();
-
-		if($prev.length) $focused.insertBefore($prev);
-		$focused.focus();
-
-		range = document.getSelection().getRangeAt(0);
-		active = range.startContainer.parentNode;
-	}
-	else
-	if(ev.altKey && ev.key == "ArrowDown"){
-		console.log(ev);
-		var $focused = $(range.endContainer.parentNode),
-			$next = $focused.nextAll('.item').first();
-
-		if($next.length) $focused.insertAfter($next);
-		$focused.focus();
-
-
-		range = document.getSelection().getRangeAt(0);
-		active = range.startContainer.parentNode;
 	}
 	else
 	if(ev.key == "F9" || ev.key == "F8"){
@@ -200,9 +234,6 @@ $(document).bind("keyup", function(ev){
 
 		chrome.runtime.sendMessage({cmd: 'writeFile', content: $field[0].innerText});
 	}
-
-
-	setActive(active);
 
 	checkLine(active);
 });

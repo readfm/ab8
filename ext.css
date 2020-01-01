@@ -31,7 +31,6 @@
 }
 
 #ab-field{
-	display: none;
 	height: auto;
 	padding-top: 0;
 	padding: 0;
@@ -44,6 +43,9 @@
 	font-weight: normal;
 	outline: none;
 	padding-left: 15px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 #ab-field a{
@@ -52,6 +54,10 @@
 
 #ab-field .item.active{
 	background-color: #68686891;
+}
+
+#ab-field .item.selected{
+	background-color: #217ac2ab;
 }
 
 #ab-field .ab-plus.on ~ .item{

@@ -111,6 +111,7 @@ chrome.browserAction.onClicked.addListener(function(tab){
 });
 
 chrome.runtime.onMessage.addListener(function(d, sender, sendResponse){
+  console.log(d);
   if(d.cmd == 'resize'){
     Pic.transform(d.height);
     sendResponse({cmd: 'transformed'});
@@ -131,6 +132,14 @@ chrome.runtime.onMessage.addListener(function(d, sender, sendResponse){
       readFile(fileHandle)
     });
 
+    return true;
+  }
+  else
+  if(d.cmd == 'listTabs'){
+    chrome.tabs.getAllInWindow(null, list => {
+      console.log(list);
+      sendResponse({list});
+    });
     return true;
   }
   else
