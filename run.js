@@ -85,6 +85,7 @@ function build(item){
 	a.contentEditable = true;
 	a.classList.add('item');
 	a.href = item.url;
+	a.target = '_blank';
 	a.innerText = item.text || item.title;
 
 	a.addEventListener('click', ev => {
@@ -100,6 +101,14 @@ function build(item){
 
 	a.addEventListener('focus', ev => {
 		setActive(a);
+	});
+
+	a.addEventListener('mouseenter', ev => {
+		a.contentEditable = false;
+	});
+
+	a.addEventListener('mouseleave', ev => {
+		a.contentEditable = true;
 	});
 	
 	checkLine(a);
@@ -140,7 +149,7 @@ $(document).bind("keydown", function(ev){
 	var active = range.startContainer.parentNode;
 
 	if(ev.altKey && ev.key == "ArrowUp"){
-		var $focused = $('.active'),
+		var $focused = $('.active, .selected'),
 			$prev = $focused.prevAll('.item').first();
 
 		if($prev.length) $focused.insertBefore($prev);
@@ -149,17 +158,22 @@ $(document).bind("keydown", function(ev){
 	else
 	if(ev.altKey && ev.key == "ArrowDown"){
 		console.log(ev);
-		var $focused = $('.active'),
+		var $focused = $('.active,.selected'),
 			$next = $focused.nextAll('.item').first();
 
 		if($next.length) $focused.insertAfter($next);
 		moveCaretToEnd($focused[0]);
 	}
 	else
-	if(ev.key == "ArrowUp" || ev.key == "ArrowDown"){
-		console.log(range.endContainer.parentNode);
+	if(
+		ev.key == "F9" || 
+		ev.key == "F10" || 
+		ev.key == "ArrowDown" || 
+		ev.key == "ArrowUp" 
+	){
+		var up = (ev.key == 'ArrowUp' || ev.key == 'F10');
 		var $focused = $(range.endContainer.parentNode);
-		var $another = $focused[(ev.key == 'ArrowUp')?'prevAll':'nextAll']('.item').first();
+		var $another = $focused[up?'prevAll':'nextAll']('.item').first();
 
 		if(ev.shiftKey) $focused[0].classList.toggle('selected');
 		else $field.find('.selected').removeClass('selected');
@@ -194,7 +208,7 @@ $(document).bind("keyup", function(ev){
 		//carousel.$t.children('.focus').next().addClass('focus').siblings().removeClass('focus');
 	}
 	else
-	if(ev.key == "F9" || ev.key == "F8"){
+	if(ev.key == "F8"){
 		var a = range.endContainer.parentNode,
 			text = a.innerText;
 
