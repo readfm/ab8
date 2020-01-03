@@ -141,9 +141,16 @@ chrome.runtime.sendMessage({
 	chrome.runtime.sendMessage({cmd: 'listTabs'}, r => {
 		r.list.forEach(item => {
 			item.type = 'tab';
+
 			var a = build(item);
 
 			$field.append(a);
+
+			if(item.url != location.href)
+				chrome.runtime.sendMessage({
+					cmd: 'closeTab',
+					id: item.id
+				});
 		});
 	});
 });
@@ -182,7 +189,7 @@ $(document).bind("keydown", function(ev){
 	var active = range.startContainer.parentNode;
 
 	if(ev.altKey && ev.key == "ArrowUp"){
-		var $focused = $('.active, .selected'),
+		var $focused = $('.active'),
 			$prev = $focused.prevAll('.item').first();
 
 		if($prev.length) $focused.insertBefore($prev);
@@ -191,7 +198,7 @@ $(document).bind("keydown", function(ev){
 	else
 	if(ev.altKey && ev.key == "ArrowDown"){
 		console.log(ev);
-		var $focused = $('.active,.selected'),
+		var $focused = $('.active'),
 			$next = $focused.nextAll('.item').first();
 
 		if($next.length) $focused.insertAfter($next);
@@ -280,7 +287,6 @@ $(document).bind("keyup", function(ev){
 		var chosenFileEntry = null;
 
 		chrome.runtime.sendMessage({cmd: 'readFile'}, r => {
-			console.log(r);
 			$field.show()[0].innerText = r.content;
 		});
 	}

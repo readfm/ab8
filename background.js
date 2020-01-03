@@ -153,6 +153,14 @@ chrome.runtime.onMessage.addListener(function(d, sender, sendResponse){
     return true;
   }
   else
+  if(d.cmd == 'listTabs'){
+    chrome.tabs.getAllInWindow(null, list => {
+      console.log(list);
+      sendResponse({list});
+    });
+    return true;
+  }
+  else
   if(d.cmd == 'list'){
     let collection = DB.collection(d.collection);
 
