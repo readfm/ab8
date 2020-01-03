@@ -135,6 +135,10 @@ chrome.runtime.onMessage.addListener(function(d, sender, sendResponse){
     return true;
   }
   else
+  if(d.cmd == 'closeTab'){
+    chrome.tabs.remove(d.id);
+  }
+  else
   if(d.cmd == 'listTabs'){
     chrome.tabs.getAllInWindow(null, list => {
       console.log(list);

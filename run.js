@@ -122,6 +122,7 @@ function build(item){
 
 chrome.runtime.sendMessage({cmd: 'listTabs'}, r => {
 	r.list.forEach(item => {
+		item.type = 'tab';
 		var a = build(item);
 
 		$field.prepend(a);
@@ -222,6 +223,12 @@ $(document).bind("keyup", function(ev){
 		if(text.trim() == '-'){
 			$(a).prevAll('.ab-plus').first().click();
 		}
+
+		if(item.type == 'tab') 
+			chrome.runtime.sendMessage({
+				cmd: 'closeTab',
+				id: item.id
+			});
 
 		if(item.url)
 			document.location = item.url;
