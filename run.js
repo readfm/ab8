@@ -60,7 +60,7 @@ var checkLine = line => {
 	a.classList.remove('ab-plus');
 	a.classList.remove('ab-minus');
 
-	if(text.trim() == '+'){
+	if(text.trim() == '+' || text.trim() == '8'){
 		a.classList.add('ab-plus');
 	}
 
