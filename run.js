@@ -124,7 +124,7 @@ chrome.runtime.sendMessage({
 	cmd: 'list', 
 	collection: Cfg.db.main.collection, 
 	filter: {
-		url: location.href
+		domain: location.host
 	}
 }, r => {
 	r.items.forEach(item => {
@@ -132,25 +132,45 @@ chrome.runtime.sendMessage({
 		$field.prepend(a);
 	});
 
-	let item = {
-		text: '8'
-	};
-	var a = build(item);
-	$field.append(a);
 
 	chrome.runtime.sendMessage({cmd: 'listTabs'}, r => {
+		if(r.list.length > 1){
+			let item = {
+				text: '8',
+				domain: location.host
+			};
+			var a = build(item);
+			$field.prepend(a);
+
+			chrome.runtime.sendMessage({
+				cmd: 'add', 
+				item,
+				collection: Cfg.db.main.collection
+			});
+		}
+
 		r.list.forEach(item => {
 			item.type = 'tab';
 
-			var a = build(item);
+			if(item.url != location.href){
+				var a = build(item);
 
-			$field.append(a);
+				$field.prepend(a);
 
-			if(item.url != location.href)
 				chrome.runtime.sendMessage({
 					cmd: 'closeTab',
 					id: item.id
 				});
+
+				var d = new Date();
+				item.time = d.getTime();
+				item.domain = location.host;
+				chrome.runtime.sendMessage({
+					cmd: 'add', 
+					item, 
+					collection: Cfg.db.main.collection
+				});
+			}
 		});
 	});
 });
@@ -169,8 +189,10 @@ $(document).bind("keydown", function(ev){
 		var item = {
 			text,
 			time: d.getTime(),
+			domain: location.host,
 			url: $input.find('.ab-url').text()
 		};
+		item.domain = location.host;
 		var a = build(item);
 
 		chrome.runtime.sendMessage({

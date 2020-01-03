@@ -171,6 +171,7 @@ chrome.runtime.onMessage.addListener(function(d, sender, sendResponse){
     return true;
   }
   if(d.cmd == 'add'){
+    console.log(d);
     let collection = DB.collection(m.collection);
 
     collection.insert(m.item);
