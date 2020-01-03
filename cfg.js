@@ -14,6 +14,13 @@ var Cfg = {
 	thumber: 'http://thumb.lh/',
 	*/
 
+	db: {
+		name: '8',
+		main: {
+			collection: 'ab'
+		}
+	},
+
 	local: true,
 	collection: 'pix8',
 	fixed: true,

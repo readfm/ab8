@@ -12,6 +12,11 @@ chrome.contextMenus.create({
 //var ipfs = IpfsApi();
 
 
+var DB = new zango.Db(Cfg.db.name, {
+    files: ['id', 'domain', 'path', 'owner'],
+    'ab': ['time', 'id', 'url']
+});
+
 window.Pic = {
   integrating: false,
   integrate: function(id){
@@ -112,6 +117,7 @@ chrome.browserAction.onClicked.addListener(function(tab){
 
 chrome.runtime.onMessage.addListener(function(d, sender, sendResponse){
   console.log(d);
+  var m = d;
   if(d.cmd == 'resize'){
     Pic.transform(d.height);
     sendResponse({cmd: 'transformed'});
@@ -147,6 +153,21 @@ chrome.runtime.onMessage.addListener(function(d, sender, sendResponse){
     return true;
   }
   else
+  if(d.cmd == 'list'){
+    let collection = DB.collection(d.collection);
+
+    collection.find(m.filter || {}).toArray().then(items => {
+      console.log(items);
+      sendResponse({items});
+    });
+    return true;
+  }
+  if(d.cmd == 'add'){
+    let collection = DB.collection(m.collection);
+
+    collection.insert(m.item);
+  }
+  else  
   if(d.cmd == 'writeFile'){
     var writeFile = async (handle, content) => {
       const writer = await handle.createWriter();

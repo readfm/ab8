@@ -120,12 +120,31 @@ function build(item){
 	return a;
 }
 
-chrome.runtime.sendMessage({cmd: 'listTabs'}, r => {
-	r.list.forEach(item => {
-		item.type = 'tab';
+chrome.runtime.sendMessage({
+	cmd: 'list', 
+	collection: Cfg.db.main.collection, 
+	filter: {
+		url: location.href
+	}
+}, r => {
+	r.items.forEach(item => {
 		var a = build(item);
-
 		$field.prepend(a);
+	});
+
+	let item = {
+		text: '8'
+	};
+	var a = build(item);
+	$field.append(a);
+
+	chrome.runtime.sendMessage({cmd: 'listTabs'}, r => {
+		r.list.forEach(item => {
+			item.type = 'tab';
+			var a = build(item);
+
+			$field.append(a);
+		});
 	});
 });
 
@@ -137,12 +156,21 @@ $(document).bind("keydown", function(ev){
 		if(!text.length) return false;
 		//let $inp = $input.clone();
 		//$inp.children().show().after('&nbsp;');
+		
+		var d = new Date();
 
 		var item = {
 			text,
+			time: d.getTime(),
 			url: $input.find('.ab-url').text()
 		};
 		var a = build(item);
+
+		chrome.runtime.sendMessage({
+			cmd: 'add', 
+			item, 
+			collection: Cfg.db.main.collection
+		});
 
 		$field.show().prepend(a);
 		fillup();
