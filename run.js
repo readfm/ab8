@@ -224,14 +224,15 @@ $(document).bind("keyup", function(ev){
 			$(a).prevAll('.ab-plus').first().click();
 		}
 
-		if(item.type == 'tab') 
+		if(item.type == 'tab'){
 			chrome.runtime.sendMessage({
 				cmd: 'closeTab',
 				id: item.id
 			});
 
-		if(item.url)
-			document.location = item.url;
+			if(item.url)
+				document.location = item.url;
+		}
 
 		ev.preventDefault();
 		return false;
