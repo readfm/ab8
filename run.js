@@ -88,6 +88,8 @@ function build(item){
 	a.target = '_blank';
 	a.innerText = item.text || item.title;
 
+	$(a).data(item);
+
 	a.addEventListener('click', ev => {
 		var a = ev.target,
 			text = a.innerText;
@@ -103,6 +105,7 @@ function build(item){
 		setActive(a);
 	});
 
+	/*
 	a.addEventListener('mouseenter', ev => {
 		a.contentEditable = false;
 	});
@@ -110,6 +113,7 @@ function build(item){
 	a.addEventListener('mouseleave', ev => {
 		a.contentEditable = true;
 	});
+	*/
 	
 	checkLine(a);
 
@@ -210,13 +214,17 @@ $(document).bind("keyup", function(ev){
 	else
 	if(ev.key == "F8"){
 		var a = range.endContainer.parentNode,
-			text = a.innerText;
+			text = a.innerText,
+			item = $(a).data();
 
 		a.classList.toggle('on');
 
 		if(text.trim() == '-'){
 			$(a).prevAll('.ab-plus').first().click();
 		}
+
+		if(item.url)
+			document.location = item.url;
 
 		ev.preventDefault();
 		return false;
