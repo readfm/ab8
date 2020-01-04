@@ -5,7 +5,7 @@ document.body.prepend(ab);
 $input = $("<div id='ab-input' contentEditable></div>").appendTo(ab);
 $field = $("<div id='ab-field'></div>").appendTo(ab);
 
-
+var select = q => document.querySelector(q);
 
 var url = new URL(location);
 
@@ -70,14 +70,10 @@ var checkLine = line => {
 };
 
 function moveCaretToEnd(el){
-	if(typeof el.selectionStart == "number" && 0){
-		el.selectionStart = el.selectionEnd = el.value.length;
-    } else{
         el.focus();
 		var range = document.createRange();
 		range.selectNode(el);
         //range.collapse(false);
-    }
 }
 
 function build(item){
@@ -134,6 +130,7 @@ chrome.runtime.sendMessage({
 
 
 	chrome.runtime.sendMessage({cmd: 'listTabs'}, r => {
+		/*
 		if(r.list.length > 1){
 			let item = {
 				text: '8',
@@ -148,6 +145,7 @@ chrome.runtime.sendMessage({
 				collection: Cfg.db.main.collection
 			});
 		}
+		*/
 
 		r.list.forEach(item => {
 			item.type = 'tab';
@@ -210,7 +208,10 @@ $(document).bind("keydown", function(ev){
 	var range = document.getSelection().getRangeAt(0);
 	var active = range.startContainer.parentNode;
 
-	if(ev.altKey && ev.key == "ArrowUp"){
+	if(
+		(ev.altKey && ev.key == "ArrowUp") || 
+		(ev.shiftKey && ev.key == "F10")
+	){
 		var $focused = $('.active'),
 			$prev = $focused.prevAll('.item').first();
 
@@ -218,7 +219,10 @@ $(document).bind("keydown", function(ev){
 		moveCaretToEnd($focused[0]);
 	}
 	else
-	if(ev.altKey && ev.key == "ArrowDown"){
+	if(
+		(ev.altKey && ev.key == "ArrowDown") || 
+		(ev.shiftKey && ev.key == "F9")
+	){
 		console.log(ev);
 		var $focused = $('.active'),
 			$next = $focused.nextAll('.item').first();
@@ -236,6 +240,15 @@ $(document).bind("keydown", function(ev){
 		var up = (ev.key == 'ArrowUp' || ev.key == 'F10');
 		var $focused = $(range.endContainer.parentNode);
 		var $another = $focused[up?'prevAll':'nextAll']('.item').first();
+
+		if($focused[0] == $input[0] && !up) 
+			return moveCaretToEnd(
+				select('#ab-field > .item:first-child')
+			);
+		else if(up && !$another[0]) 
+			return moveCaretToEnd(
+				document.querySelector('#ab-input .ab-text')
+			) && false;
 
 		if(ev.shiftKey) $focused[0].classList.toggle('selected');
 		else $field.find('.selected').removeClass('selected');
