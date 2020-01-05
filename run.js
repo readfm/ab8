@@ -82,7 +82,9 @@ function build(item){
 	a.classList.add('item');
 	a.href = item.url;
 	a.target = '_blank';
-	a.innerText = item.text || item.title;
+	a.innerText = item.text || item.title || '';
+
+	var text = a.innerText.trim();
 
 	$(a).data(item);
 
@@ -99,6 +101,23 @@ function build(item){
 
 	a.addEventListener('focus', ev => {
 		setActive(a);
+		a.savedText = a.innerText;
+	});
+
+	a.addEventListener('blur', ev => {
+
+		if(a.savedText != a.innerText){
+			a.savedText = a.innerText;
+
+			chrome.runtime.sendMessage({
+				cmd: 'update', 
+				set: {
+					text: a.innerText
+				},
+				id: item.id,
+				collection: Cfg.db.main.collection
+			});
+		}
 	});
 
 	/*
@@ -112,6 +131,10 @@ function build(item){
 	*/
 	
 	checkLine(a);
+
+	if(a.classList.contains('ab-plus'))
+		a.classList.add('on');
+
 
 	return a;
 }
@@ -149,20 +172,23 @@ chrome.runtime.sendMessage({
 
 		r.list.forEach(item => {
 			item.type = 'tab';
+			item.id_tab = item.id;
+			item.id = Math.random().toString(36).substr(2, 6);
 
 			if(item.url != location.href){
+				var d = new Date();
+				item.time = d.getTime();
+				item.domain = location.host;
+
 				var a = build(item);
 
 				$field.prepend(a);
 
 				chrome.runtime.sendMessage({
 					cmd: 'closeTab',
-					id: item.id
+					id: item.id_tab
 				});
 
-				var d = new Date();
-				item.time = d.getTime();
-				item.domain = location.host;
 				chrome.runtime.sendMessage({
 					cmd: 'add', 
 					item, 
@@ -173,11 +199,44 @@ chrome.runtime.sendMessage({
 	});
 });
 
+function insertAfter(newNode, referenceNode) {
+    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+}
+
+var prev;
 $(document).bind("keydown", function(ev){
+	var range = document.getSelection().getRangeAt(0);
+
 	if(/*ev.shiftKey && */ev.key == "Enter"){
-		ev.preventDefault();
+		var focused = range.endContainer.parentNode;
+
+		if(focused.classList.contains('item')){
+			var text = focused.innerText.trim(),
+				item = $(focused).data();
+
+
+			item.id = Math.random().toString(36).substr(2, 6);
+
+			item.text = '';
+			delete item.title;
+			delete item._id;
+			item.time = item.time.toFixed(2) - 0.01;
+			var a = build(item);
+			insertAfter(a, focused)
+			a.focus();
+
+			chrome.runtime.sendMessage({
+				cmd: 'add', 
+				item, 
+				collection: Cfg.db.main.collection
+			});
+
+			ev.preventDefault();
+			return false;
+		}
 
 		var text = $input.find('.ab-text').text().trim();
+		//var text = $focused.text().trim();
 		if(!text.length) return false;
 		//let $inp = $input.clone();
 		//$inp.children().show().after('&nbsp;');
@@ -186,6 +245,7 @@ $(document).bind("keydown", function(ev){
 
 		var item = {
 			text,
+			id: Math.random().toString(36).substr(2, 6),
 			time: d.getTime(),
 			domain: location.host,
 			url: $input.find('.ab-url').text()
@@ -202,10 +262,10 @@ $(document).bind("keydown", function(ev){
 		$field.show().prepend(a);
 		fillup();
 
+		ev.preventDefault();
 		return false;
 	}
 
-	var range = document.getSelection().getRangeAt(0);
 	var active = range.startContainer.parentNode;
 
 	if(
@@ -217,6 +277,10 @@ $(document).bind("keydown", function(ev){
 
 		if($prev.length) $focused.insertBefore($prev);
 		moveCaretToEnd($focused[0]);
+
+
+		ev.preventDefault();
+		return false;
 	}
 	else
 	if(
@@ -229,6 +293,9 @@ $(document).bind("keydown", function(ev){
 
 		if($next.length) $focused.insertAfter($next);
 		moveCaretToEnd($focused[0]);
+
+		ev.preventDefault();
+		return false;
 	}
 	else
 	if(
@@ -259,6 +326,8 @@ $(document).bind("keydown", function(ev){
 		ev.preventDefault();
 		return false;
 	}
+
+	prev = ev.key;
 });
 
 $(document).bind("keyup", function(ev){
@@ -268,6 +337,8 @@ $(document).bind("keyup", function(ev){
 		return;
 	}
 	*/
+
+	console.log(ev.key);
 
 	var range = document.getSelection().getRangeAt(0);
 	var active = range.startContainer.parentNode;
@@ -297,7 +368,7 @@ $(document).bind("keyup", function(ev){
 		if(item.type == 'tab'){
 			chrome.runtime.sendMessage({
 				cmd: 'closeTab',
-				id: item.id
+				id: item.tab_id
 			});
 
 			if(item.url)
@@ -313,7 +384,11 @@ $(document).bind("keyup", function(ev){
 		var $next = $inp.next();
 		if(!$next.length) $next = $('#ab-input > div:first-child');
 
-		$next.attr('hidden', null).siblings().attr('hidden', true);;
+		$next.attr('hidden', null).siblings().attr('hidden', true);
+
+
+		ev.preventDefault();
+		return false;
 	}
 	else
 	if(ev.key == "F4"){
@@ -324,6 +399,10 @@ $(document).bind("keyup", function(ev){
 		chrome.runtime.sendMessage({cmd: 'readFile'}, r => {
 			$field.show()[0].innerText = r.content;
 		});
+
+
+		ev.preventDefault();
+		return false;
 	}
 	else
 	if(ev.key == "F7"){
@@ -332,6 +411,10 @@ $(document).bind("keyup", function(ev){
 		var chosenFileEntry = null;
 
 		chrome.runtime.sendMessage({cmd: 'writeFile', content: $field[0].innerText});
+
+
+		ev.preventDefault();
+		return false;
 	}
 
 	checkLine(active);

@@ -153,28 +153,25 @@ chrome.runtime.onMessage.addListener(function(d, sender, sendResponse){
     return true;
   }
   else
-  if(d.cmd == 'listTabs'){
-    chrome.tabs.getAllInWindow(null, list => {
-      console.log(list);
-      sendResponse({list});
-    });
-    return true;
-  }
-  else
   if(d.cmd == 'list'){
     let collection = DB.collection(d.collection);
 
-    collection.find(m.filter || {}).toArray().then(items => {
+    collection.find(m.filter || {}).sort({time: 1}).toArray().then(items => {
       console.log(items);
       sendResponse({items});
     });
     return true;
   }
   if(d.cmd == 'add'){
-    console.log(d);
     let collection = DB.collection(m.collection);
 
     collection.insert(m.item);
+  }
+  else
+  if(d.cmd == 'update'){
+    let collection = DB.collection(m.collection);
+
+    collection.update({id: m.id}, {$set: m.set});
   }
   else  
   if(d.cmd == 'writeFile'){
