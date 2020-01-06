@@ -283,6 +283,12 @@ $(document).bind("keydown", function(ev){
 		return false;
 	}
 	else
+	if(ev.key == "F1"){
+		ab.hidden = !ab.hidden;
+		ev.preventDefault();
+		return false;
+	}
+	else
 	if(
 		(ev.altKey && ev.key == "ArrowDown") || 
 		(ev.shiftKey && ev.key == "F9")
