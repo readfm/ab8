@@ -143,7 +143,7 @@ chrome.runtime.sendMessage({
 	cmd: 'list', 
 	collection: Cfg.db.main.collection, 
 	filter: {
-		domain: location.host
+		href: location.href
 	}
 }, r => {
 	r.items.forEach(item => {
@@ -179,6 +179,7 @@ chrome.runtime.sendMessage({
 				var d = new Date();
 				item.time = d.getTime();
 				item.domain = location.host;
+				item.href = location.href;
 
 				var a = build(item);
 
@@ -248,9 +249,9 @@ $(document).bind("keydown", function(ev){
 			id: Math.random().toString(36).substr(2, 6),
 			time: d.getTime(),
 			domain: location.host,
+			href: location.href,
 			url: $input.find('.ab-url').text()
 		};
-		item.domain = location.host;
 		var a = build(item);
 
 		chrome.runtime.sendMessage({
@@ -285,6 +286,14 @@ $(document).bind("keydown", function(ev){
 	else
 	if(ev.key == "F1"){
 		ab.hidden = !ab.hidden;
+
+		/*
+  		sendResponse({
+  			visible: $(ab).is(':visible'),
+  			height: $(ab).height()
+  		});
+	*/
+	
 		ev.preventDefault();
 		return false;
 	}
@@ -484,9 +493,10 @@ Pix.collectFixed();
 
 
 chrome.runtime.onMessage.addListener(function(d, sender, sendResponse){
+	console.log(d);
 	let $ab = $(ab);
   	if(d.cmd == 'carousel'){
-  		if(d.do) $ab[d.do]();
+  		ab.hidden = (d.do == 'hide')
   		sendResponse({
   			visible: $ab.is(':visible'),
   			height: $ab.height()
@@ -536,7 +546,7 @@ chrome.runtime.onMessage.addListener(function(d, sender, sendResponse){
   	}
   	else
   	if(d.cmd == 'hideCarousel'){
-  		$ab.hide();
+  		ab.hidden = true;
   		sendResponse({visible: $ab.is(':visible')});
   		//sendResponse({pong: true});
   	}
