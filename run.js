@@ -49,6 +49,7 @@ $field[0].addEventListener('change', ev => {
 	a.classList[(text.trim() == '-')?'add':'remove']('ab-minus');	
 });
 
+
 var setActive = (el) => {
 	$field.children('.active').removeClass('active');
 	el.classList.add('active');
