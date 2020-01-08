@@ -2,6 +2,7 @@ var ab = document.createElement('div');
 ab.id = 'ab';
 document.body.prepend(ab);
 
+//$menu = $("<div id='ab-menu'>8 <div id='ab-cmds'>F4=list F2=link F1=on</div> </div>").appendTo(ab);
 $input = $("<div id='ab-input' contentEditable></div>").appendTo(ab);
 $field = $("<div id='ab-field'></div>").appendTo(ab);
 
@@ -70,10 +71,10 @@ var checkLine = line => {
 };
 
 function moveCaretToEnd(el){
-        el.focus();
-		var range = document.createRange();
-		range.selectNode(el);
-        //range.collapse(false);
+    el.focus();
+	var range = document.createRange();
+	range.selectNode(el);
+    //range.collapse(false);
 }
 
 function build(item){
@@ -204,55 +205,25 @@ function insertAfter(newNode, referenceNode) {
     referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
 
-var prev;
-$(document).bind("keydown", function(ev){
+function enter(){
 	var range = document.getSelection().getRangeAt(0);
 
-	if(/*ev.shiftKey && */ev.key == "Enter"){
-		var focused = range.endContainer.parentNode;
+	var focused = range.endContainer.parentNode;
 
-		if(focused.classList.contains('item')){
-			var text = focused.innerText.trim(),
-				item = $(focused).data();
+	if(focused.classList.contains('item')){
+		var text = focused.innerText.trim(),
+			item = $(focused).data();
 
 
-			item.id = Math.random().toString(36).substr(2, 6);
+		item.id = Math.random().toString(36).substr(2, 6);
 
-			item.text = '';
-			delete item.title;
-			delete item._id;
-			item.time = item.time.toFixed(2) - 0.01;
-			var a = build(item);
-			insertAfter(a, focused)
-			a.focus();
-
-			chrome.runtime.sendMessage({
-				cmd: 'add', 
-				item, 
-				collection: Cfg.db.main.collection
-			});
-
-			ev.preventDefault();
-			return false;
-		}
-
-		var text = $input.find('.ab-text').text().trim();
-		//var text = $focused.text().trim();
-		if(!text.length) return false;
-		//let $inp = $input.clone();
-		//$inp.children().show().after('&nbsp;');
-		
-		var d = new Date();
-
-		var item = {
-			text,
-			id: Math.random().toString(36).substr(2, 6),
-			time: d.getTime(),
-			domain: location.host,
-			href: location.href,
-			url: $input.find('.ab-url').text()
-		};
+		item.text = '';
+		delete item.title;
+		delete item._id;
+		item.time = item.time.toFixed(2) - 0.01;
 		var a = build(item);
+		insertAfter(a, focused)
+		a.focus();
 
 		chrome.runtime.sendMessage({
 			cmd: 'add', 
@@ -260,9 +231,45 @@ $(document).bind("keydown", function(ev){
 			collection: Cfg.db.main.collection
 		});
 
-		$field.show().prepend(a);
-		fillup();
+		ev.preventDefault();
+		return false;
+	}
 
+	var text = $input.find('.ab-text').text().trim();
+	//var text = $focused.text().trim();
+	if(!text.length) return false;
+	//let $inp = $input.clone();
+	//$inp.children().show().after('&nbsp;');
+	
+	var d = new Date();
+
+	var item = {
+		text,
+		id: Math.random().toString(36).substr(2, 6),
+		time: d.getTime(),
+		domain: location.host,
+		href: location.href,
+		url: $input.find('.ab-url').text()
+	};
+	var a = build(item);
+
+	chrome.runtime.sendMessage({
+		cmd: 'add', 
+		item, 
+		collection: Cfg.db.main.collection
+	});
+
+	$field.show().prepend(a);
+	fillup();
+}
+
+var prev;
+$(document).bind("keydown", function(ev){
+
+	var range = document.getSelection().getRangeAt(0);
+
+	if(/*ev.shiftKey && */ev.key == "Enter"){
+		enter();
 		ev.preventDefault();
 		return false;
 	}
@@ -293,6 +300,9 @@ $(document).bind("keydown", function(ev){
   			height: $(ab).height()
   		});
 	*/
+		var text = $input.find('.ab-text').text().trim();
+
+		if(text) enter();
 	
 		ev.preventDefault();
 		return false;
@@ -408,16 +418,27 @@ $(document).bind("keyup", function(ev){
 	else
 	if(ev.key == "F4"){
 		//carousel.$t.children('.focus').click();
+		var text = $input.find('.ab-text').text().trim();
+		if(text) enter();
 
+		/*
 		var chosenFileEntry = null;
 
 		chrome.runtime.sendMessage({cmd: 'readFile'}, r => {
 			$field.show()[0].innerText = r.content;
 		});
-
+		*/
 
 		ev.preventDefault();
 		return false;
+	}
+	else
+	if(ev.key == "Delete"){
+		var $active = $('#ab-field .active');
+
+		$active.next().addClass('active').focus();
+
+		$active.remove();
 	}
 	else
 	if(ev.key == "F7"){
