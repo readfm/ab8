@@ -16,7 +16,7 @@
       "toggle": {
          "description": "Show/hide stuff",
          "suggested_key": {
-            "default": "Ctrl+A"
+            "default": "Ctrl+Shift+A"
          }
       }
    },

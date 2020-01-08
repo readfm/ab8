@@ -292,23 +292,6 @@ $(document).bind("keydown", function(ev){
 		return false;
 	}
 	else
-	if(ev.key == "F1"){
-		ab.hidden = !ab.hidden;
-
-		/*
-  		sendResponse({
-  			visible: $(ab).is(':visible'),
-  			height: $(ab).height()
-  		});
-	*/
-		var text = $input.find('.ab-text').text().trim();
-
-		if(text) enter();
-	
-		ev.preventDefault();
-		return false;
-	}
-	else
 	if(
 		(ev.altKey && ev.key == "ArrowDown") || 
 		(ev.shiftKey && ev.key == "F9")
@@ -349,6 +332,23 @@ $(document).bind("keydown", function(ev){
 		moveCaretToEnd($another[0]);
 
 		//$prev.focus();
+		ev.preventDefault();
+		return false;
+	}
+	else
+	if(ev.key == "F1"){
+		ab.hidden = !ab.hidden;
+
+		/*
+  		sendResponse({
+  			visible: $(ab).is(':visible'),
+  			height: $(ab).height()
+  		});
+	*/
+		var text = $input.find('.ab-text').text().trim();
+
+		if(text) enter();
+	
 		ev.preventDefault();
 		return false;
 	}
@@ -421,6 +421,9 @@ $(document).bind("keyup", function(ev){
 		//carousel.$t.children('.focus').click();
 		var text = $input.find('.ab-text').text().trim();
 		if(text) enter();
+
+
+		$field[0].hidden = !$field[0].hidden;
 
 		/*
 		var chosenFileEntry = null;
