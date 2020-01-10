@@ -162,6 +162,19 @@ chrome.runtime.onMessage.addListener(function(d, sender, sendResponse){
     });
     return true;
   }
+  else
+  if(d.cmd == 'get'){
+    let collection = DB.collection(d.collection);
+
+    var filter = m.id?{id: m.id}:m.filter;
+
+    collection.findOne(filter, (err, item) => {
+      console.log(err, item)
+      sendResponse({item});
+    });
+    return true;
+  }
+  else
   if(d.cmd == 'add'){
     let collection = DB.collection(m.collection);
 

@@ -83,6 +83,7 @@ function build(item){
 	a.contentEditable = true;
 	a.classList.add('item');
 	a.href = item.url;
+	a.id = 'item_'+item.id;
 	a.target = '_blank';
 	a.innerText = item.text || item.title || '';
 
@@ -141,66 +142,144 @@ function build(item){
 	return a;
 }
 
-chrome.runtime.sendMessage({
-	cmd: 'list', 
-	collection: Cfg.db.main.collection, 
-	filter: {
-		href: location.href
-	}
-}, r => {
-	r.items.forEach(item => {
-		var a = build(item);
-		$field.prepend(a);
+function saveSequence(){
+	var ids = [];
+	document.querySelectorAll('#ab-field > *').forEach(el => {
+		ids.push(el.id.split('_')[1])
 	});
 
+	var item = $(ab).data();
+	$(ab).data('sub', ids);
 
-	chrome.runtime.sendMessage({cmd: 'listTabs'}, r => {
-		/*
-		if(r.list.length > 1){
-			let item = {
-				text: '8',
-				domain: location.host
-			};
+	chrome.runtime.sendMessage({
+		cmd: 'update', 
+		collection: Cfg.db.main.collection, 
+		id: item.id,
+		set: {
+			sub: ids
+		}
+	});
+}
+
+
+function sort_list(sequence){
+	var sequence = $(ab).data('sub');
+
+	$field.children().sortDomElements(function(a,b){
+	    var id_a = $(a).data('id');
+	    var id_b = $(b).data('id');
+
+	    if (id_a == id_b) return 0;
+	    if (sequence.indexOf(id_a) < sequence.indexOf(id_b)) return -1;
+	    if (sequence.indexOf(id_a) > sequence.indexOf(id_b)) return 1;
+	})
+
+	console.log(sequence);
+}
+
+function fetch_list(item_link){
+	if(item_link)
+		$(ab).data(item_link);
+	else
+		item_link = $(ab).data();
+
+	var filter = {href: location.href};
+
+	chrome.runtime.sendMessage({
+		cmd: 'list', 
+		collection: Cfg.db.main.collection, 
+		filter
+	}, r => {
+		$field.empty();
+
+		r.items.forEach(item => {
 			var a = build(item);
 			$field.prepend(a);
+		});
 
-			chrome.runtime.sendMessage({
-				cmd: 'add', 
-				item,
-				collection: Cfg.db.main.collection
-			});
-		}
-		*/
 
-		r.list.forEach(item => {
-			item.type = 'tab';
-			item.id_tab = item.id;
-			item.id = Math.random().toString(36).substr(2, 6);
-
-			if(item.url != location.href){
-				var d = new Date();
-				item.time = d.getTime();
-				item.domain = location.host;
-				item.href = location.href;
-
+		chrome.runtime.sendMessage({cmd: 'listTabs'}, r => {
+			/*
+			if(r.list.length > 1){
+				let item = {
+					text: '8',
+					domain: location.host
+				};
 				var a = build(item);
-
 				$field.prepend(a);
 
 				chrome.runtime.sendMessage({
-					cmd: 'closeTab',
-					id: item.id_tab
-				});
-
-				chrome.runtime.sendMessage({
 					cmd: 'add', 
-					item, 
+					item,
 					collection: Cfg.db.main.collection
 				});
 			}
+			*/
+
+			r.list.forEach(item => {
+				item.type = 'tab';
+				item.id_tab = item.id;
+				item.id = Math.random().toString(36).substr(2, 6);
+
+				if(item.url != location.href){
+					var d = new Date();
+					item.time = d.getTime();
+					item.domain = location.host;
+					item.href = location.href;
+
+					var a = build(item);
+
+					$field.prepend(a);
+
+					chrome.runtime.sendMessage({
+						cmd: 'closeTab',
+						id: item.id_tab
+					});
+
+					chrome.runtime.sendMessage({
+						cmd: 'add', 
+						item, 
+						collection: Cfg.db.main.collection
+					});
+				}
+			});
+
+
+			if(ab.classList.contains('sorted')){
+				sort_list();
+			}
 		});
 	});
-});
+}
+
+
+function fetch_ab(item_link){
+	chrome.runtime.sendMessage({
+		cmd: 'get',
+		filter: {url: location.href},
+		collection: Cfg.db.main.collection
+	}, function(r){
+		console.log(r);
+		if(r.item)
+			fetch_list(r.item);
+		else{
+			var item = {
+				id: Math.random().toString(36).substr(2, 5),
+				url: location.href,
+				title: document.getElementsByTagName('title')[0].innerText
+			};
+
+			chrome.runtime.sendMessage({
+				cmd: 'add',
+				item,
+				collection: Cfg.db.main.collection
+			});
+
+			fetch_list(item);
+		}
+	});
+}
+fetch_ab();
 
 function insertAfter(newNode, referenceNode) {
     referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
@@ -287,6 +366,7 @@ $(document).bind("keydown", function(ev){
 		if($prev.length) $focused.insertBefore($prev);
 		moveCaretToEnd($focused[0]);
 
+		saveSequence()
 
 		ev.preventDefault();
 		return false;
@@ -302,6 +382,8 @@ $(document).bind("keydown", function(ev){
 
 		if($next.length) $focused.insertAfter($next);
 		moveCaretToEnd($focused[0]);
+
+		saveSequence()
 
 		ev.preventDefault();
 		return false;
@@ -337,7 +419,19 @@ $(document).bind("keydown", function(ev){
 	}
 	else
 	if(ev.key == "F1"){
-		ab.hidden = !ab.hidden;
+		if(ab.classList.contains('sorted')){
+			ab.hidden = true;
+			ab.classList.remove('sorted')
+		}
+		else
+		if(ab.hidden){
+			ab.hidden = false;
+			fetch_list();
+		}
+		else{
+			ab.classList.add('sorted')
+			fetch_list();
+		}
 
 		/*
   		sendResponse({
