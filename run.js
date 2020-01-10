@@ -419,19 +419,7 @@ $(document).bind("keydown", function(ev){
 	}
 	else
 	if(ev.key == "F1"){
-		if(ab.classList.contains('sorted')){
-			ab.hidden = true;
-			ab.classList.remove('sorted')
-		}
-		else
-		if(ab.hidden){
-			ab.hidden = false;
-			fetch_list();
-		}
-		else{
-			ab.classList.add('sorted')
-			fetch_list();
-		}
+		ab.hidden = !ab.hidden;
 
 		/*
   		sendResponse({
@@ -516,8 +504,24 @@ $(document).bind("keyup", function(ev){
 		var text = $input.find('.ab-text').text().trim();
 		if(text) enter();
 
+		let field = $field[0];
 
-		$field[0].hidden = !$field[0].hidden;
+
+		if(ab.classList.contains('sorted')){
+			field.hidden = true;
+			ab.classList.remove('sorted')
+		}
+		else
+		if(field.hidden){
+			field.hidden = false;
+			fetch_list();
+		}
+		else{
+			ab.classList.add('sorted')
+			fetch_list();
+		}
+
+		//$field[0].hidden = !$field[0].hidden;
 
 		/*
 		var chosenFileEntry = null;
