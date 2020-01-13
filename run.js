@@ -2,7 +2,7 @@ var ab = document.createElement('div');
 ab.id = 'ab';
 document.body.prepend(ab);
 
-//$menu = $("<div id='ab-menu'>8 <div id='ab-cmds'>F4=list F2=link F1=on</div> </div>").appendTo(ab);
+$menu = $("<div id='ab-menu'>8 <div id='ab-cmds'>F4=list F2=link F1=on</div> </div>").appendTo(ab);
 $input = $("<div id='ab-input' contentEditable></div>").appendTo(ab);
 $field = $("<div id='ab-field'></div>").appendTo(ab);
 
@@ -310,9 +310,6 @@ function enter(){
 			item, 
 			collection: Cfg.db.main.collection
 		});
-
-		ev.preventDefault();
-		return false;
 	}
 
 	var text = $input.find('.ab-text').text().trim();
@@ -419,7 +416,16 @@ $(document).bind("keydown", function(ev){
 	}
 	else
 	if(ev.key == "F1"){
-		ab.hidden = !ab.hidden;
+		if(ab.hidden){
+			ab.hidden = false;
+			$menu[0].hidden = false;
+		}
+		else
+		if(!$menu[0].hidden){
+			$menu[0].hidden = true;
+		}
+		else
+			ab.hidden = true;
 
 		/*
   		sendResponse({
@@ -535,12 +541,24 @@ $(document).bind("keyup", function(ev){
 		return false;
 	}
 	else
-	if(ev.key == "Delete"){
+	if(ev.key == "Delete" && ev.shiftKey){
+
+		var a = range.endContainer.parentNode,
+			text = a.innerText,
+			item = $(a).data();
+
+
 		var $active = $('#ab-field .active');
 
 		$active.next().addClass('active').focus();
 
 		$active.remove();
+
+		chrome.runtime.sendMessage({
+			cmd: 'remove', 
+			id: item.id,
+			collection: Cfg.db.main.collection
+		});
 	}
 	else
 	if(ev.key == "F7"){

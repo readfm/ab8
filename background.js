@@ -175,6 +175,15 @@ chrome.runtime.onMessage.addListener(function(d, sender, sendResponse){
     return true;
   }
   else
+  if(d.cmd == 'remove'){
+    let collection = DB.collection(d.collection);
+
+    var filter = m.id?{id: m.id}:m.filter;
+
+    collection.remove(filter);
+    return true;
+  }
+  else
   if(d.cmd == 'add'){
     let collection = DB.collection(m.collection);
 
