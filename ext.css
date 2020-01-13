@@ -11,29 +11,17 @@
 	backdrop-filter: blur(5px);
 	background-color: #101010ba;
 	border-bottom: 1px solid black;
+	font-family: "Courier New", Courier, monospace;
 }
 
 *[hidden]{
 	display: none !important;
 }
 
-#ab-menu{
-	background: #333;
-	color: white;
-}
-
-#ab-cmds{
-	display: inline-block;
-	float: right;
-	font-size: 16px;
-	padding: 2px;
-}
-
 
 #ab-input, #ab-field{
 	display: block;
 	font-size: 18px;
-	font-family: "Courier New", Courier, monospace;
 	text-align: left;
 	overflow: hidden;
 	outline: none;
@@ -87,4 +75,20 @@
 }
 #ab-field a.item.ab-minus ~ .item{
 	display: block;
+}
+
+
+
+#ab-menu{
+	background: #222;
+	color: #BBB;
+	padding: 3px 12px 1px;
+}
+
+#ab-cmds{
+	display: inline-block;
+	float: right;
+	font-size: 16px;
+	padding: 2px;
+	color: inherit;
 }
