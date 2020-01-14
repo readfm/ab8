@@ -385,14 +385,14 @@ $(document).bind("keydown", function(ev){
 		(ev.shiftKey && ev.key == "F10")
 	)){
 
-		selectAll('.selected').forEach((el, i) => {
-
+		selectAll('.selected,.active').forEach((el, i) => {
+			el.parentElement.insertBefore(el, el.previousElementSibling)
 		});
 
 		var $focused = $('.active'),
 			$prev = $focused.prevAll('.item').first();
 
-		if($prev.length) $focused.insertBefore($prev);
+		//if($prev.length) $focused.insertBefore($prev);
 		moveCaretToEnd($focused[0]);
 
 		saveSequence()
@@ -405,11 +405,15 @@ $(document).bind("keydown", function(ev){
 		(ev.altKey && ev.key == "ArrowDown") || 
 		(ev.shiftKey && ev.key == "F9")
 	)){
-		console.log(ev);
+
+		selectAll('.selected,.active').reverse().forEach((el, i) => {
+			el.parentElement.insertBefore(el, el.nextElementSibling.nextElementSibling)
+		});
+
 		var $focused = $('.active'),
 			$next = $focused.nextAll('.item').first();
 
-		if($next.length) $focused.insertAfter($next);
+		//if($next.length) $focused.insertAfter($next);
 		moveCaretToEnd($focused[0]);
 
 		saveSequence()
