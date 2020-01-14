@@ -177,6 +177,8 @@ chrome.runtime.onMessage.addListener(function(d, sender, sendResponse){
   else
   if(d.cmd == 'remove'){
     let collection = DB.collection(d.collection);
+    
+    if(!m.id && !m.filter) return;
 
     var filter = m.id?{id: m.id}:m.filter;
 

@@ -1,12 +1,18 @@
 var ab = document.createElement('div');
 ab.id = 'ab';
+ab.classList.add('sorted');
 document.body.prepend(ab);
 
-$menu = $("<div id='ab-menu'>8 <div id='ab-cmds'>F4=list F2=link F1=on</div> </div>").appendTo(ab);
+$menu = $("<div id='ab-menu'>8 <div id='ab-cmds'><span id='ctrl_f4'>F4=list</span> F2=link F1=on</div> </div>").appendTo(ab);
 $input = $("<div id='ab-input' contentEditable></div>").appendTo(ab);
-$field = $("<div id='ab-field'></div>").appendTo(ab);
+$field = $("<div id='ab-field'</div>").appendTo(ab);
 
 var select = q => document.querySelector(q);
+
+const selectAll = qs => Array.prototype.slice.call(
+	document.querySelectorAll(qs)
+);
+
 
 var url = new URL(location);
 
@@ -19,7 +25,7 @@ var fillup = () => {
 	var addr = location.href//.replace('http://', '').replace('https://', '');
 	$input.append(`<div hidden class='ab-url'>${addr}</div>`);
 	$input.append("<span hidden class='current_time'></div>");
-	$input.focus();
+	text.focus();
 	placeCaretAtEnd(text);
 }
 
@@ -77,6 +83,7 @@ function moveCaretToEnd(el){
 	range.selectNode(el);
     //range.collapse(false);
 }
+
 
 function build(item){
 	var a = document.createElement('a');
@@ -144,6 +151,10 @@ function build(item){
 
 function saveSequence(){
 	var ids = [];
+
+	var is_sorted = ab.classList.contains('sorted');
+	if(!is_sorted) return;
+
 	document.querySelectorAll('#ab-field > *').forEach(el => {
 		ids.push(el.id.split('_')[1])
 	});
@@ -185,6 +196,8 @@ function fetch_list(item_link){
 
 	var filter = {href: location.href};
 
+	var is_sorted = ab.classList.contains('sorted');
+
 	chrome.runtime.sendMessage({
 		cmd: 'list', 
 		collection: Cfg.db.main.collection, 
@@ -193,6 +206,10 @@ function fetch_list(item_link){
 		$field.empty();
 
 		r.items.forEach(item => {
+			let text = item.title || item.text;
+			if(!text || text.trim() == '8' && !is_sorted)
+				return;
+
 			var a = build(item);
 			$field.prepend(a);
 		});
@@ -203,7 +220,8 @@ function fetch_list(item_link){
 			if(r.list.length > 1){
 				let item = {
 					text: '8',
-					domain: location.host
+					domain: location.host,
+					href: location.href
 				};
 				var a = build(item);
 				$field.prepend(a);
@@ -244,10 +262,10 @@ function fetch_list(item_link){
 				}
 			});
 
-
-			if(ab.classList.contains('sorted')){
+			if(is_sorted)
 				sort_list();
-			}
+			
+			document.querySelector('#ab-input .ab-text').focus();
 		});
 	});
 }
@@ -259,7 +277,6 @@ function fetch_ab(item_link){
 		filter: {url: location.href},
 		collection: Cfg.db.main.collection
 	}, function(r){
-		console.log(r);
 		if(r.item)
 			fetch_list(r.item);
 		else{
@@ -290,6 +307,9 @@ function enter(){
 
 	var focused = range.endContainer.parentNode;
 
+
+	var is_sorted = ab.classList.contains('sorted');
+
 	if(focused.classList.contains('item')){
 		var text = focused.innerText.trim(),
 			item = $(focused).data();
@@ -310,6 +330,9 @@ function enter(){
 			item, 
 			collection: Cfg.db.main.collection
 		});
+
+		if(is_sorted)
+			saveSequence();
 	}
 
 	var text = $input.find('.ab-text').text().trim();
@@ -345,6 +368,9 @@ $(document).bind("keydown", function(ev){
 
 	var range = document.getSelection().getRangeAt(0);
 
+
+	var is_sorted = ab.classList.contains('sorted');
+
 	if(/*ev.shiftKey && */ev.key == "Enter"){
 		enter();
 		ev.preventDefault();
@@ -353,10 +379,16 @@ $(document).bind("keydown", function(ev){
 
 	var active = range.startContainer.parentNode;
 
-	if(
+
+	if(is_sorted && (
 		(ev.altKey && ev.key == "ArrowUp") || 
 		(ev.shiftKey && ev.key == "F10")
-	){
+	)){
+
+		selectAll('.selected').forEach((el, i) => {
+
+		});
+
 		var $focused = $('.active'),
 			$prev = $focused.prevAll('.item').first();
 
@@ -369,10 +401,10 @@ $(document).bind("keydown", function(ev){
 		return false;
 	}
 	else
-	if(
+	if(is_sorted && (
 		(ev.altKey && ev.key == "ArrowDown") || 
 		(ev.shiftKey && ev.key == "F9")
-	){
+	)){
 		console.log(ev);
 		var $focused = $('.active'),
 			$next = $focused.nextAll('.item').first();
@@ -513,18 +545,18 @@ $(document).bind("keyup", function(ev){
 		let field = $field[0];
 
 
-		if(ab.classList.contains('sorted')){
-			field.hidden = true;
-			ab.classList.remove('sorted')
-		}
-		else
 		if(field.hidden){
+			ab.classList.add('sorted')
 			field.hidden = false;
 			fetch_list();
 		}
-		else{
-			ab.classList.add('sorted')
+		else
+		if(ab.classList.contains('sorted')){
+			ab.classList.remove('sorted')
 			fetch_list();
+		}
+		else{
+			field.hidden = true;
 		}
 
 		//$field[0].hidden = !$field[0].hidden;
