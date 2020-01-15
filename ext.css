@@ -80,8 +80,9 @@
 }
 
 
-.sorted #ctrl_f4{
+.sorted #ctrl_f4::after{
 	color: white;
+	content: ' sorted';
 }
 
 #ab-menu{
