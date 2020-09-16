@@ -4,10 +4,13 @@ TAG eat tabs
 
 tabs too many problem, solvent: list tabs under TAG, sort list
 
+indexed_db saves local, can sync to server.tld/~usr/tag
+
+then aggregate community list for tag server.tld/tag (kinda like hn/reddit)
+
 soon, sort action items for any tag
 
-8play
-
+8 will eat action game below:
 
 # ab8 program   
 1 OFF/on switch    
