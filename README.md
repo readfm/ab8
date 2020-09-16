@@ -1,3 +1,14 @@
+https://youtu.be/kZiKYmK9Usw?t=18
+
+TAG eat tabs
+
+tabs too many problem, solvent: list tabs under TAG, sort list
+
+soon, sort action items for any tag
+
+8play
+
+
 # ab8 program   
 1 OFF/on switch    
 2 TEXT input     
