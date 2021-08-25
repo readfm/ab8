@@ -2,15 +2,11 @@ https://youtu.be/kZiKYmK9Usw?t=18
 
 TAG eat tabs
 
-tabs too many problem, solvent: list tabs under TAG, sort list
+tabs if too many, then list text tabs under TAG, sort list
 
-indexed_db saves local, can sync to server.tld/~usr/tag
+indexed_db saves local, could sync to F:/drive and server.tld/~usr/tag 
 
-then aggregate community list for tag server.tld/tag (kinda like hn/reddit)
-
-soon, sort action items for any tag
-
-8 will eat action game below:
+time unix timestamp stream for 1 user in 1 memory, then copy maybe
 
 # ab8 program   
 1 OFF/on switch    
@@ -22,4 +18,4 @@ soon, sort action items for any tag
 7 C new option(s)   
 8 THING /old /new /want      
 
-
+programmable meme thing, find, bet, <more less>
