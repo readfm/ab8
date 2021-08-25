@@ -19,3 +19,5 @@ time unix timestamp stream for 1 user in 1 memory, then copy maybe
 8 THING /old /new /want      
 
 programmable meme thing, find, bet, <more less>
+
+![8play](https://user-images.githubusercontent.com/2864627/130834499-d041b44e-d9d9-4abf-8e61-6f4b4ec8db4f.gif)
